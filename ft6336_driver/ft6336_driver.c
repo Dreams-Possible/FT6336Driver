@@ -72,29 +72,29 @@ uint8_t ft6336_read(uint16_t*tc1,uint16_t*tc2)
 {
     uint8_t state=0;
     read(TC_NUM,&state,1);
-    if(state)
+    if(state&&tc1)
     {
         uint16_t x1=0;
         uint16_t y1=0;
         uint8_t t1[4];
-        read(TC1,&tc1,4);
-        x1=((uint16_t)(t1[0]&0X0f)<<8)+buf[1];
-        y1=((uint16_t)(t1[2]&0X0f)<<8)+buf[3];
+        read(TC1,t1,4);
+        x1=((uint16_t)(t1[0]&0X0f)<<8)+t1[1];
+        y1=((uint16_t)(t1[2]&0X0f)<<8)+t1[3];
         tc1[0]=x1;
         tc1[1]=y1;
-        if(state>1)
+        if(state>1&&tc2)
         {
             uint16_t x2=0;
             uint16_t y2=0;
-            uint8_t t1[2];
-            read(TC2,&t2,4);
-            x2=((uint16_t)(t1[0]&0X0f)<<8)+buf[1];
-            y2=((uint16_t)(t1[2]&0X0f)<<8)+buf[3];
+            uint8_t t2[2];
+            read(TC2,t2,4);
+            x2=((uint16_t)(t2[0]&0X0f)<<8)+t2[1];
+            y2=((uint16_t)(t2[2]&0X0f)<<8)+t2[3];
             tc2[0]=x2;
             tc2[1]=y2;
         }
     }
-    return;
+    return state;
 }
 
 #endif//#ifdef FT6336_DRIVER_H
