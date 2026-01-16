@@ -3,8 +3,7 @@
 #ifndef FT6336_DRIVER_H
 #define FT6336_DRIVER_H
 
-//include
-#include<stdio.h>
+//依赖
 #include<stdint.h>
 
 //初始化FT6336
