@@ -1,100 +1,91 @@
 #include"ft6336_driver.h"
-//enable ft6336 driver
+//启用FT6336驱动
 #ifdef FT6336_DRIVER_H
 
-//define
-#define ADDR 0x38
-#define ID 0xa8
-#define TC_NUM 0x02
-#define TC1 0x03
-#define TC2 0x09
+//寄存器地址定义
+#define FT6336_ADDR 0x38
+#define FT6336_ID 0xa8
+#define FT6336_TC_NUM 0x02
+#define FT6336_TC1 0x03
+#define FT6336_TC2 0x09
 
-//write data
-static void write(uint8_t addr,uint8_t data);
-//read data
-static void read(uint8_t addr,uint8_t*data,uint8_t len);
-//init iic
-static void init_iic();
-//init software
-static void init_soft();
-//ft6336 init
-void ft6336_init();
-//ft6336 id
-uint8_t ft6336_id();
-//ft6336 read
-void ft6336_read(uint16_t*tc1,uint16_t*tc2);
+//IIC读数据
+static uint8_t iic_read(uint8_t addr,uint8_t*data,uint8_t len);
+//用户初始化
+static uint8_t init_user();
+//初始化FT6336
+uint8_t ft6336_init();
+//读取FT6336器件ID
+uint8_t ft6336_read_id();
+//读取FT6336触摸数据
+uint8_t ft6336_read_touch(uint8_t*num,uint16_t*tc1,uint16_t*tc2);
 
-//write data
-static void write(uint8_t addr,uint8_t data)
+//IIC读数据
+static uint8_t iic_read(uint8_t addr,uint8_t*data,uint8_t len)
 {
-     
-    return;
+    return 0;
 }
 
-//read data
-static void read(uint8_t addr,uint8_t*data,uint8_t len)
-{
-    
-    return;
-}
-
-//init iic
-static void init_iic()
+//用户初始化
+static uint8_t init_user()
 {
 
-    return;
+    return 0;
 }
 
-//init software
-static void init_soft()
+//FT6336初始化
+uint8_t ft6336_init()
 {
-    return;
+    if(init_user())
+    {
+        return 1;
+    }
+    return 0;
 }
 
-//ft6336 init
-void ft6336_init()
-{
-    init_iic();
-    init_soft();
-    return;
-}
-
-//ft6336 id
-uint8_t ft6336_id()
+//读取FT6336器件ID
+uint8_t ft6336_read_id()
 {
     uint8_t id=0;
-    read(ID,&id,1);
+    iic_read(FT6336_ID,&id,1);
     return id;
 }
 
-//ft6336 read
-uint8_t ft6336_read(uint16_t*tc1,uint16_t*tc2)
+//读取FT6336触摸数据
+uint8_t ft6336_read_touch(uint8_t*num,uint16_t*tc1,uint16_t*tc2)
 {
-    uint8_t state=0;
-    read(TC_NUM,&state,1);
-    if(state&&tc1)
+    uint8_t tc_num=0;
+    if(iic_read(FT6336_TC_NUM,&tc_num,1))
+    {
+        return 1;
+    }
+    if(num)
+    {
+        *num=tc_num;
+    }
+    if(tc_num>0&&tc1)
     {
         uint16_t x1=0;
         uint16_t y1=0;
         uint8_t t1[4];
-        read(TC1,t1,4);
+        iic_read(FT6336_TC1,t1,4);
         x1=((uint16_t)(t1[0]&0X0f)<<8)+t1[1];
         y1=((uint16_t)(t1[2]&0X0f)<<8)+t1[3];
         tc1[0]=x1;
         tc1[1]=y1;
-        if(state>1&&tc2)
+        if(tc_num>1&&tc2)
         {
             uint16_t x2=0;
             uint16_t y2=0;
             uint8_t t2[2];
-            read(TC2,t2,4);
+            iic_read(FT6336_TC2,t2,4);
             x2=((uint16_t)(t2[0]&0X0f)<<8)+t2[1];
             y2=((uint16_t)(t2[2]&0X0f)<<8)+t2[3];
             tc2[0]=x2;
             tc2[1]=y2;
         }
     }
-    return state;
+    return 0;
 }
 
 #endif//#ifdef FT6336_DRIVER_H
